@@ -1,0 +1,65 @@
+import React, { useState } from "react";
+import Axios from "axios";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PdfDocument } from "./GenLabel";
+import { Button, Input, InputBlock, Title, LabelInput } from "./LabelStyled";
+import { infosFromFingerprint } from "./libs/infoFromFingerprint";
+import { sanitizedList } from "./libs/sanitizedList";
+
+const Label = () => {
+  const [recipeDetails, setRecipeDetails] = useState([]);
+  const [newFingerprint, setNewFingerprint] = useState("");
+  const [snl, setSnl] = useState([]);
+  const [show, setShow] = useState(false);
+  const url =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:8080/api/rest/label"
+      : process.env.REACT_APP_API_URL;
+
+  const fetchRecipe = async () => {
+    try {
+      let res = await Axios(`${url}/${newFingerprint}`);
+      setRecipeDetails(res.data.recipes[0]);
+      const ar = infosFromFingerprint(newFingerprint);
+      const sl = sanitizedList(res.data.recipes[0], ar);
+      setSnl(sl);
+      setShow(res.data.recipes.length > 0 ? true : false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <InputBlock>
+      <Title>générateur d'étiquettes depuis la recette</Title>
+      <LabelInput htmlFor="recetteID">Recette ID</LabelInput>
+      <Input
+        name="recetteID"
+        value={newFingerprint}
+        placeholder="ID de la recette"
+        onChange={(e) => setNewFingerprint(e.target.value)}
+      />
+      <Button onClick={() => fetchRecipe()}>Générer le pdf</Button>
+
+      {show && (
+        <PDFDownloadLink
+          document={
+            <PdfDocument
+              sanitizeList={snl}
+              mixRisk={recipeDetails.risks}
+              name={recipeDetails.name}
+            />
+          }
+          fileName={`bobblemix-${recipeDetails.name}.pdf`}
+          className="download"
+        >
+          {({ blob, url, loading, error }) =>
+            !error && loading ? "Chargement..." : "Télécharger le Pdf"
+          }
+        </PDFDownloadLink>
+      )}
+    </InputBlock>
+  );
+};
+
+export default Label;
