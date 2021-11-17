@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { PdfDocument } from "./GenLabel";
@@ -6,7 +6,9 @@ import { Button, Input, InputBlock, Title, LabelInput } from "./LabelStyled";
 import { infosFromFingerprint } from "./libs/infoFromFingerprint";
 import { sanitizedList } from "./libs/sanitizedList";
 
-const Label = () => {
+const Label = (props) => {
+  const { recipe_id } = props;
+  // console.log("recipe_id", recipe_id);
   const [recipeDetails, setRecipeDetails] = useState([]);
   const [newFingerprint, setNewFingerprint] = useState("");
   const [snl, setSnl] = useState([]);
@@ -15,6 +17,12 @@ const Label = () => {
     process.env.NODE_ENV === "development"
       ? "http://localhost:8080/api/rest/label"
       : process.env.REACT_APP_API_URL;
+
+  useEffect(() => {
+    if (recipe_id) {
+      setNewFingerprint(recipe_id);
+    }
+  }, [recipe_id]);
 
   const fetchRecipe = async () => {
     try {
@@ -35,7 +43,7 @@ const Label = () => {
       <LabelInput htmlFor="recetteID">Recette ID</LabelInput>
       <Input
         name="recetteID"
-        value={newFingerprint}
+        value={!recipe_id ? newFingerprint : recipe_id}
         placeholder="ID de la recette"
         onChange={(e) => setNewFingerprint(e.target.value)}
       />
