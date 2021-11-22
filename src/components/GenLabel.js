@@ -426,7 +426,6 @@ export function PdfDocument(props) {
               </Text>
               <Text style={styles.recipeOverview}>
                 Ingrédients : Propylène Glycol, Glycérine Végétale, Arômes
-                alimentaires
               </Text>
             </View>
             <View style={styles.overviewContainer}>
@@ -450,7 +449,7 @@ export function PdfDocument(props) {
                       {i.Molecule} | {i.Molecule_ID}
                     </i>
                   ))}
-                <> | Peut produire une réaction allergique.</>
+                <></>
               </Text>
             </View>
             <View style={styles.overviewPicto}>
