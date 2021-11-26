@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { PdfDocument } from "./GenLabel";
-import { Button, Input, InputBlock, Title, LabelInput } from "./LabelStyled";
+import {
+  Button,
+  Input,
+  InputBlock,
+  Title,
+  LabelInput,
+  Logo,
+  SubTitle,
+} from "./LabelStyled";
 import { infosFromFingerprint } from "./libs/infoFromFingerprint";
 import { sanitizedList } from "./libs/sanitizedList";
 
@@ -39,7 +47,16 @@ const Label = (props) => {
 
   return (
     <InputBlock>
+      <Logo>
+        <img
+          src="https://res.cloudinary.com/dagmffgu0/image/upload/v1632390513/bobble_mix_assets/logos/logo_bobble_liquide_128px_kxhmkv.png"
+          alt="logo bobble"
+        />
+      </Logo>
       <Title>générateur d'étiquettes depuis la recette</Title>
+      <SubTitle>
+        Cliquer sur le bouton Générer le pdf puis veuillez le télécharger
+      </SubTitle>
       <LabelInput htmlFor="recetteID">Recette ID</LabelInput>
       <Input
         name="recetteID"
