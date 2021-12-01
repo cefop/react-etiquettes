@@ -43,6 +43,13 @@ const styles = StyleSheet.create({
   },
   recipeOverview: {
     fontSize: 22,
+    //whiteSpace: "pre-wrap",
+    wordBreak: "keep-all",
+    //wordWarp: "unset",
+    //wordWrap: "break-word",
+    overflow: "unset",
+    overflowWrap: "unset",
+    hyphens: "none",
   },
   image: {
     height: 72,
@@ -428,30 +435,40 @@ export function PdfDocument(props) {
                 Ingrédients : Propylène Glycol, Glycérine Végétale, Arômes
               </Text>
             </View>
-            <View style={styles.overviewContainer}>
-              <Text style={styles.recipeOverview}>
-                Contient :{/* // ? check conditions to show molecules  */}
-                {isEUH208A.arr.length > 0 &&
-                  isEUH208A.arr.map((i, k) => (
-                    <i key={k}>
-                      {i.Molecule} | {i.Molecule_ID}
-                    </i>
-                  ))}
-                {isEUH208B.arr.length > 0 &&
-                  isEUH208B.arr.map((i, k) => (
-                    <i key={k}>
-                      {i.Molecule} | {i.Molecule_ID}
-                    </i>
-                  ))}
-                {isEUH208C.arr.length > 0 &&
-                  isEUH208C.arr.map((i, k) => (
-                    <i key={k}>
-                      {i.Molecule} | {i.Molecule_ID}
-                    </i>
-                  ))}
-                <></>
-              </Text>
-            </View>
+
+            {isEUH208A.b || isEUH208B.b || isEUH208C.b ? (
+              <View style={styles.overviewContainer}>
+                {/* // ? check conditions to show molecules */}
+                <Text style={styles.recipeOverview}>
+                  Contient :
+                  {isEUH208A.arr.length > 0 &&
+                    isEUH208A.arr.map((i, k, arr) => (
+                      <i key={k}>
+                        {i.Molecule} ({i.Molecule_ID})
+                        {arr.length - 1 === k && !isEUH208B.b && !isEUH208C.b
+                          ? ". "
+                          : ", "}
+                      </i>
+                    ))}
+                  {isEUH208B.arr.length > 0 &&
+                    isEUH208B.arr.map((i, k, arr) => (
+                      <i key={k}>
+                        {i.Molecule} ({i.Molecule_ID})
+                        {arr.length - 1 === k && !isEUH208C.b ? ". " : ", "}
+                      </i>
+                    ))}
+                  {isEUH208C.arr.length > 0 &&
+                    isEUH208C.arr.map((i, k, arr) => (
+                      <i key={k}>
+                        {i.Molecule} ({i.Molecule_ID})
+                        {arr.length - 1 === k ? ". " : ", "}
+                      </i>
+                    ))}
+                  <i> Peut produire une réaction allergique.</i>
+                </Text>
+              </View>
+            ) : null}
+
             <View style={styles.overviewPicto}>
               <Image
                 style={styles.image}
@@ -493,28 +510,28 @@ export function PdfDocument(props) {
                   !isH226.b &&
                   !isH412.b &&
                   !isH413.b &&
-                  "En cas de consultation d'un médecin, garder à disposition le récipient ou l'étiquette Tenir hors de portée des enfants. Se laver les mains soigneusement après manipulation"}
+                  " En cas de consultation d'un médecin, garder à disposition le récipient ou l'étiquette Tenir hors de portée des enfants. Se laver les mains soigneusement après manipulation"}
                 {/*  Cas2, mélange classé que H317  */}
                 {isH317.b &&
                   !isH412.b &&
                   !isH413.b &&
-                  "Peut provoquer une allergie cutanée. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire ou fumer en manipulant ce produit. En cas de contact avec la peau : laver abondamment à l’eau et au savon. Éliminer le contenu dans un centre de traitement agréé."}
+                  " Peut provoquer une allergie cutanée. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire ou fumer en manipulant ce produit. En cas de contact avec la peau : laver abondamment à l’eau et au savon. Éliminer le contenu dans un centre de traitement agréé."}
                 {/* Cas4, mélange classé que H412 */}
                 {isH412.b &&
                   !isH317.b &&
-                  "Nocif pour les organismes aquatiques. entraîne des effets néfastes à long terme. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire, ou fumer en manipulant ce produit. Se laver les mains soigneusement après manipulation. Éliminer le contenu dans un centre de traitement agréé."}
+                  " Nocif pour les organismes aquatiques. entraîne des effets néfastes à long terme. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire, ou fumer en manipulant ce produit. Se laver les mains soigneusement après manipulation. Éliminer le contenu dans un centre de traitement agréé."}
                 {/* Cas5, mélange classé H413 */}
                 {isH413.b &&
                   !isH317 &&
-                  "Peut être nocif à long terme pour les organismes aquatiques. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire, ou fumer en manipulant ce produit. Se laver les mains soigneusement après manipulation."}
+                  " Peut être nocif à long terme pour les organismes aquatiques. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire, ou fumer en manipulant ce produit. Se laver les mains soigneusement après manipulation."}
                 {/* Cas6, mélange classé H317 + H412 */}
                 {isH317.b &&
                   isH412.b &&
-                  "Peut provoquer une allergie cutanée. Nocif pour les organismes aquatiques. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire ou fumer en manipulant ce produit. En cas de contact avec la peau : laver abondamment à l’eau et au savon. Éliminer le contenu dans un centre de traitement agréé."}
+                  " Peut provoquer une allergie cutanée. Nocif pour les organismes aquatiques. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire ou fumer en manipulant ce produit. En cas de contact avec la peau : laver abondamment à l’eau et au savon. Éliminer le contenu dans un centre de traitement agréé."}
                 {/* Cas7, mélange classé H317 + H413 */}
                 {isH317.b &&
                   isH413.b &&
-                  "Peut provoquer une allergie cutanée. Peut être nocif à long terme pour les organismes aquatiques. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire ou fumer en manipulant ce produit. En cas de contact avec la peau : laver abondamment à l’eau et au savon. Éliminer le contenu dans un centre de traitement agréé."}
+                  " Peut provoquer une allergie cutanée. Peut être nocif à long terme pour les organismes aquatiques. En cas de consultation d’un médecin, garder à disposition le récipient ou l’étiquette. Tenir hors de portée des enfants. Ne pas manger, boire ou fumer en manipulant ce produit. En cas de contact avec la peau : laver abondamment à l’eau et au savon. Éliminer le contenu dans un centre de traitement agréé."}
               </Text>
             </View>
             <View style={styles.detailsFooter}>
