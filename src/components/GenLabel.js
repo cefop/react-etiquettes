@@ -27,11 +27,15 @@ const styles = StyleSheet.create({
   },
   recipeDetails: {
     display: "grid",
-    textAlign: "center",
+    textAlign: "left",
+  },
+  kind: {
+    fontSize: 18,
+    marginBottom: 2,
   },
   recipeTitle: {
     fontSize: 28,
-    fontWeight: "heavy",
+    fontWeight: 1300,
     textTransform: "uppercase",
     marginBottom: 10,
   },
@@ -52,8 +56,12 @@ const styles = StyleSheet.create({
     hyphens: "none",
   },
   image: {
-    height: 72,
-    width: 72,
+    height: 82,
+    width: 82,
+  },
+  image_att: {
+    height: 175,
+    width: 175,
   },
   overviewContainer: {
     textAlign: "left",
@@ -65,15 +73,19 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",
+    alignItems: "center",
     marginBottom: 20,
   },
   boldOverview: {
     fontWeight: "bold",
   },
   detailsFooter: {
-    display: "grid",
+    display: "flex",
+    flexDirection: "column",
   },
   madein: {
+    justifyContent: "space-around",
+    alignContent: "flex-end",
     marginTop: 16,
     fontSize: 18,
     fontWeight: 700,
@@ -81,10 +93,12 @@ const styles = StyleSheet.create({
 });
 
 export function PdfDocument(props) {
-  const { sanitizeList, mixRisk, name } = props;
+  const { sanitizeList, mixRisk, name, shop_name } = props;
   // console.log("props sanitizeList", sanitizeList);
   // console.log("props mixRisk", mixRisk);
   // console.log("props name", name);
+
+  const capitalize = (s) => (s && s[0].toUpperCase() + s.slice(1)) || "";
 
   const now = new Date();
   const nowadd6month = add(new Date(), {
@@ -422,6 +436,7 @@ export function PdfDocument(props) {
           <View style={styles.recipeDetails}>
             <Text style={styles.recipeTitle}>bobble mix</Text>
             {/* // ? Check if name is okay  */}
+            <Text style={styles.kind}>E-Liquide</Text>
             {name ? (
               <Text style={styles.recipeSubTitle}>{name}</Text>
             ) : (
@@ -468,8 +483,20 @@ export function PdfDocument(props) {
                 </Text>
               </View>
             ) : null}
-
+            <View style={styles.overviewContainer}>
+              <Text style={styles.recipeOverview}>
+                DDM : {format(nowadd6month, "dd.MM.yyyy", {})}
+              </Text>
+              <Text style={styles.recipeOverview}>
+                N° de lot : {format(now, "yyyyMMddHHmmss", {})}
+              </Text>
+            </View>
             <View style={styles.overviewPicto}>
+              <Image
+                style={styles.image}
+                alt="recycling"
+                source="https://res.cloudinary.com/dagmffgu0/image/upload/v1630925429/icone_bobble_mix/recycle_f617gc.png"
+              />
               <Image
                 style={styles.image}
                 alt="adult"
@@ -480,27 +507,14 @@ export function PdfDocument(props) {
                 alt="pregnant"
                 source="https://res.cloudinary.com/dagmffgu0/image/upload/v1630925429/icone_bobble_mix/femme_enceinte_d9a5iy.png"
               />
-              <Image
-                style={styles.image}
-                alt="recycling"
-                source="https://res.cloudinary.com/dagmffgu0/image/upload/v1630925429/icone_bobble_mix/recycle_f617gc.png"
-              />
               {/* // ? check if we must show attention picto  */}
               {isH317.b && (
                 <Image
-                  style={styles.image}
+                  style={styles.image_att}
                   alt="attention"
                   source="https://res.cloudinary.com/dagmffgu0/image/upload/v1630926475/icone_bobble_mix/attention_hyp4mu.png"
                 />
               )}
-            </View>
-            <View style={styles.overviewContainer}>
-              <Text style={styles.recipeOverview}>
-                DDM : {format(nowadd6month, "dd.MM.yyyy", {})}
-              </Text>
-              <Text style={styles.recipeOverview}>
-                N° de lot : {format(now, "yyyyMMddHHmmss", {})}
-              </Text>
             </View>
             <View style={styles.overviewContainer}>
               <Text style={styles.recipeOverview}>
@@ -535,7 +549,12 @@ export function PdfDocument(props) {
               </Text>
             </View>
             <View style={styles.detailsFooter}>
-              <Text style={styles.madein}>Fabriqué en France</Text>
+              <Text style={styles.madein}>Fabriqué en FRANCE par CEFOP</Text>
+              <Text>
+                7 Rue du 8 Mai 1945 94470 Boissy-St Tél. 01 84 69 00 30
+                contact@bobbleliquide.com www.bobbleliquide.com. Mixé et
+                conditionné par {capitalize(shop_name)}
+              </Text>
             </View>
           </View>
         </View>

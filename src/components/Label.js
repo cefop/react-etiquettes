@@ -15,16 +15,26 @@ import { infosFromFingerprint } from "./libs/infoFromFingerprint";
 import { sanitizedList } from "./libs/sanitizedList";
 
 const Label = (props) => {
-  const { recipe_id } = props;
-  // console.log("recipe_id", recipe_id);
+  const { recipe_id, rid, shop_name, shop_id } = props;
   const [recipeDetails, setRecipeDetails] = useState([]);
   const [newFingerprint, setNewFingerprint] = useState("");
+  const [userPhone, setUserPhone] = useState("");
   const [snl, setSnl] = useState([]);
   const [show, setShow] = useState(false);
   const url =
     process.env.NODE_ENV === "development"
       ? "http://localhost:8080/api/rest/label"
       : process.env.REACT_APP_API_URL;
+
+  const hasuraEndpoint =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:8080/v1/graphql"
+      : process.env.REACT_APP_HASURA_ENDPOINT;
+
+  const hasuraAdminSec =
+    process.env.NODE_ENV === "development"
+      ? "hasuraadminpassword"
+      : process.env.REACT_APP_HASURA_ADMIN_SECRET;
 
   useEffect(() => {
     if (recipe_id) {
@@ -45,6 +55,38 @@ const Label = (props) => {
     }
   };
 
+  const mutationRecipe = async (user_phone) => {
+    const validated = user_phone.length > 4 ? true : false;
+    try {
+      const data = await Axios.post(
+        hasuraEndpoint,
+        {
+          query: `mutation MyMutation($recipe_id: uuid, $shop_id: uuid, $user_phone: String, $validated: Boolean) {
+            insert_transactions_one(object: {recipe_id: $recipe_id, shop_id: $shop_id, user_phone: $user_phone, validated: $validated}) {
+              id
+            }
+          }
+          `,
+          variables: {
+            recipe_id: rid,
+            shop_id,
+            user_phone,
+            validated,
+          },
+        },
+        {
+          headers: {
+            "content-type": "application/json",
+            "x-hasura-admin-secret": hasuraAdminSec,
+          },
+        }
+      );
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <InputBlock>
       <Logo>
@@ -55,8 +97,24 @@ const Label = (props) => {
       </Logo>
       <Title>générateur d'étiquettes depuis la recette</Title>
       <SubTitle>
+        Nouvelle transaction pour {shop_name}
+        <br />
         Cliquer sur le bouton Générer le pdf puis veuillez le télécharger
       </SubTitle>
+
+      {/* user phone  */}
+      <LabelInput htmlFor="userPhone">
+        Téléphone du client (pas obligatoire)
+      </LabelInput>
+      <Input
+        name="userPhone"
+        value={userPhone}
+        placeholder="0601020304"
+        disabled={show}
+        onChange={(e) => setUserPhone(e.target.value)}
+      />
+
+      {/* recette ID  */}
       <LabelInput htmlFor="recetteID">Recette ID</LabelInput>
       <Input
         name="recetteID"
@@ -64,7 +122,14 @@ const Label = (props) => {
         placeholder="ID de la recette"
         onChange={(e) => setNewFingerprint(e.target.value)}
       />
-      <Button onClick={() => fetchRecipe()}>Générer le pdf</Button>
+      <Button
+        onClick={async () => {
+          await mutationRecipe(userPhone);
+          await fetchRecipe();
+        }}
+      >
+        Générer le pdf
+      </Button>
 
       {show && (
         <PDFDownloadLink
@@ -73,6 +138,7 @@ const Label = (props) => {
               sanitizeList={snl}
               mixRisk={recipeDetails.risks}
               name={recipeDetails.name}
+              shop_name={shop_name}
             />
           }
           fileName={`bobblemix-${recipeDetails.name}.pdf`}
